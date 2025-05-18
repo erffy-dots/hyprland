@@ -1,15 +1,10 @@
-![Desktop Screenshot](assets/desktop.png)
+## Erffy Dots - [Hyprland](https://github.com/hyprwm/Hyprland)
+My hyprland configuration files
 
-A sleek and minimalist desktop setup for Arch Linux powered by [Hyprland](https://github.com/hyprwm/Hyprland), optimized for performance, aesthetics, and productivity.
+### Installation
+```sh
+bash -c "bash <(curl -sL https://raw.githubusercontent.com/erffy-dots/hyprland/main/install.sh)"
+```
 
----
-
-## 📦 Requirements
-
-- A working Arch Linux installation
-- Basic familiarity with the terminal and git
-
----
-
-## 🛠️ Installation Guide
-- Coming soon
+### Screenshots
+![](assets/desktop.png)
