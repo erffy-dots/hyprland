@@ -7,4 +7,4 @@ bash -c "bash <(curl -sL https://raw.githubusercontent.com/erffy-dots/hyprland/m
 ```
 
 ### Screenshots
-![](assets/desktop.png)
+![](https://raw.githubusercontent.com/erffy-dots/.generic/main/assets/desktop.png)
