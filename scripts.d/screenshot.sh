@@ -1,181 +1,27 @@
 #!/usr/bin/env bash
 
-## Author  : Aditya Shakya (adi1090x)
-## Github  : @adi1090x
-#
-## Applets : Screenshot (Ported to use Grimblast)
+## Author: Aditya Shakya, Gonçalo Duarte
 
-## Modify
-## Author  : Gonçalo Duarte (MrDuartePT)
-## Github  : @MrDuartePT
-
-## Port for Grimblast (https://github.com/hyprwm/contrib/tree/main/grimblast)
-## Aur Package: grimblast-git (https://aur.archlinux.org/packages/grimblast-git)
-
-## Add this to the ~/.config/user-dirs.dirs to save in the Screenshots folder: XDG_SCREENSHOTS_DIR="$HOME/Screenshots"
+set -e
 
 prompt='Screenshot'
-mesg="DIR: ~/Screenshots"
+mesg="DIR: $XDG_SCREENSHOTS_DIR"
 
-# Options
-option_1="󰹑 Capture"
-option_2="󰁫 Timer capture"
+# Screenshot types
+option_capture_1="screen"
+option_capture_2="output"
+option_capture_3="area"
 
-option_capture_1="󰍺 All Screen"
-option_capture_2="󰍹 Capture Active Screen"
-option_capture_3="󱣴 Capture Area/Window/Application"
+# Defaults
+countdown=0
+option_type_screenshot=""
+actions=()
 
-option_time_1="5s"
-option_time_2="10s"
-option_time_3="20s"
-option_time_4="30s"
-option_time_5="60s"
-#option_time_4="Custom (in seconds)" # Roadmap or someone contribute :)
-
-list_col='1'
-list_row='2'
-win_width='300px'
-
-copy=' Copy'
-save=' Save'
-copy_save='Copy & Save'
-edit='Edit Screenshot'
-
-# Rofi CMD
-rofi_cmd() {
-  rofi -theme-str "window {width: $win_width;}" \
-    -theme-str "listview {columns: $list_col; lines: $list_row;}" \
-    -theme-str 'textbox-prompt-colon {str: "";}' \
-    -dmenu \
-    -p "$prompt" \
-    -mesg "$mesg" \
-    -markup-rows
-}
-
-# Pass variables to rofi dmenu
-run_rofi() {
-  echo -e "$option_1\n$option_2" | rofi_cmd
-}
-
-####
-# Choose Timer
-# CMD
-timer_cmd() {
-  rofi -theme-str 'window {location: center; anchor: center; fullscreen: false; width: 400px;}' \
-    -theme-str 'mainbox {orientation: vertical; children: [ "message", "listview" ];}' \
-    -theme-str 'listview {columns: 1; lines: 5;}' \
-    -theme-str 'element-text {horizontal-align: 0.5;}' \
-    -theme-str 'textbox {horizontal-align: 0.5;}' \
-    -dmenu \
-    -p 'Choose Option' \
-    -mesg 'Choose timer:'
-}
-
-# Ask for confirmation
-timer_exit() {
-  echo -e "$option_time_1\n$option_time_2\n$option_time_3\n$option_time_4\n$option_time_5" | timer_cmd
-}
-
-# Confirm and execute
-timer_run() {
-  selected_timer="$(timer_exit)"
-  if [[ "$selected_timer" == "$option_time_1" ]]; then
-    countdown=5
-    ${1}
-  elif [[ "$selected_timer" == "$option_time_2" ]]; then
-    countdown=10
-    ${1}
-  elif [[ "$selected_timer" == "$option_time_3" ]]; then
-    countdown=20
-    ${1}
-  elif [[ "$selected_timer" == "$option_time_4" ]]; then
-    countdown=30
-    ${1}
-  elif [[ "$selected_timer" == "$option_time_5" ]]; then
-    countdown=60
-    ${1}
-  fi
-}
-###
-
-####
-# Chose Screenshot Type
-# CMD
-type_screenshot_cmd() {
-  rofi -theme-str 'window {location: center; anchor: center; fullscreen: false; width: 400px;}' \
-    -theme-str 'mainbox {orientation: vertical; children: [ "message", "listview" ];}' \
-    -theme-str 'listview {columns: 1; lines: 3;}' \
-    -theme-str 'element-text {horizontal-align: 0.5;}' \
-    -theme-str 'textbox {horizontal-align: 0.5;}' \
-    -dmenu \
-    -p 'Choose Option' \
-    -mesg 'Type Of Screenshot:'
-}
-
-# Ask for confirmation
-type_screenshot_exit() {
-  echo -e "$option_capture_1\n$option_capture_2\n$option_capture_3" | type_screenshot_cmd
-}
-
-# Confirm and execute
-type_screenshot_run() {
-  selected_type_screenshot="$(type_screenshot_exit)"
-  if [[ "$selected_type_screenshot" == "$option_capture_1" ]]; then
-    option_type_screenshot=screen
-    ${1}
-  elif [[ "$selected_type_screenshot" == "$option_capture_2" ]]; then
-    option_type_screenshot=output
-    ${1}
-  elif [[ "$selected_type_screenshot" == "$option_capture_3" ]]; then
-    option_type_screenshot=area
-    ${1}
-  fi
-}
-###
-
-####
-# Choose to save or copy photo
-# CMD
-copy_save_editor_cmd() {
-  rofi -theme-str 'window {location: center; anchor: center; fullscreen: false; width: 400px;}' \
-    -theme-str 'mainbox {orientation: vertical; children: [ "message", "listview" ];}' \
-    -theme-str 'listview {columns: 2; lines: 2;}' \
-    -theme-str 'element-text {horizontal-align: 0.5;}' \
-    -theme-str 'textbox {horizontal-align: 0.5;}' \
-    -dmenu \
-    -p 'Choose Option' \
-    -mesg 'Copy/save the screenshot or open in image editor'
-}
-
-# Ask for confirmation
-copy_save_editor_exit() {
-  echo -e "$copy\n$save\n$copy_save\n$edit" | copy_save_editor_cmd
-}
-
-# Confirm and execute
-copy_save_editor_run() {
-  selected_chosen="$(copy_save_editor_exit)"
-  if [[ "$selected_chosen" == "$copy" ]]; then
-    option_chosen=copy
-    ${1}
-  elif [[ "$selected_chosen" == "$save" ]]; then
-    option_chosen=save
-    ${1}
-  elif [[ "$selected_chosen" == "$copy_save" ]]; then
-    option_chosen=copysave
-    ${1}
-  elif [[ "$selected_chosen" == "$edit" ]]; then
-    option_chosen=edit
-    ${1}
-  fi
-}
-###
-
+# Function: Countdown Timer
 timer() {
   if [[ $countdown -gt 10 ]]; then
     notify-send -t 1000 "Taking Screenshot in ${countdown} seconds"
-    countdown_less_10=$((countdown - 10))
-    sleep $countdown_less_10
+    sleep $((countdown - 10))
     countdown=10
   fi
   while [[ $countdown -ne 0 ]]; do
@@ -185,35 +31,116 @@ timer() {
   done
 }
 
-# take shots
+# Function: Take Screenshot and apply actions
 takescreenshot() {
-  grimblast --notify "$option_chosen" "$option_type_screenshot"
+  [[ $countdown -gt 0 ]] && timer
+
+  tempfile="/tmp/screenshot_$(date +%s).png"
+  grimblast save "$option_type_screenshot" "$tempfile"
+
+  for action in "${actions[@]}"; do
+    case "$action" in
+      copy)
+        wl-copy < "$tempfile"
+        ;;
+      save)
+        mkdir -p $XDG_SCREENSHOTS_DIR
+        cp "$tempfile" $XDG_SCREENSHOTS_DIR/Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png
+        ;;
+      edit)
+        ${EDITOR:-imv} "$tempfile"
+        ;;
+    esac
+  done
 }
 
-takescreenshot_timer() {
-  timer
-  grimblast --notify "$option_chosen" "$option_type_screenshot"
+# Parse CLI Arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --screen) option_type_screenshot="$option_capture_1" ;;
+      --output) option_type_screenshot="$option_capture_2" ;;
+      --area) option_type_screenshot="$option_capture_3" ;;
+      --copy) actions+=("copy") ;;
+      --save) actions+=("save") ;;
+      --edit) actions+=("edit") ;;
+      --delay)
+        shift
+        [[ $1 =~ ^[0-9]+$ ]] && countdown=$1 || { echo "Invalid delay value"; exit 1; }
+        ;;
+      -h|--help)
+        echo "Usage: screenshot.sh [--screen|--output|--area] [--copy] [--save] [--edit] [--delay N]"
+        echo
+        echo "If no arguments are passed, Rofi UI will be shown."
+        exit 0
+        ;;
+      *)
+        echo "Unknown option: $1"
+        exit 1
+        ;;
+    esac
+    shift
+  done
 }
 
-# Execute Command
-run_cmd() {
-  if [[ "$1" == '--opt1' ]]; then
-    type_screenshot_run
-    copy_save_editor_run "takescreenshot"
-  elif [[ "$1" == '--opt2' ]]; then
-    timer_run
-    type_screenshot_run
-    copy_save_editor_run "takescreenshot_timer"
+# Rofi fallback UI
+fallback_rofi() {
+  # Helper for rofi menu
+  rofi_cmd() {
+    rofi -theme-str "window {width: 400px;}" \
+      -theme-str "listview {columns: 1; lines: 2;}" \
+      -dmenu -p "$prompt" -mesg "$mesg" -markup-rows
+  }
+
+  # Screenshot type menu
+  type_screenshot_cmd() {
+    echo -e "󰍺 All Screen\n󰍹 Active Screen\n󱣴 Area" | rofi -theme-str 'window {width: 400px;}' \
+      -dmenu -p 'Screenshot Type' -mesg 'Choose:'
+  }
+
+  # Copy/Save menu
+  copy_save_cmd() {
+    echo -e " Copy\n Save\nCopy & Save\nEdit Screenshot" | rofi -theme-str 'window {width: 400px;}' \
+      -dmenu -p 'Action' -mesg 'Choose:'
+  }
+
+  # Timer menu
+  timer_cmd() {
+    echo -e "0\n5\n10\n20\n30\n60" | rofi -theme-str 'window {width: 400px;}' \
+      -dmenu -p 'Delay (seconds)' -mesg 'Optional delay:'
+  }
+
+  chosen="$(echo -e "󰹑 Capture\n󰁫 Timer Capture" | rofi_cmd)"
+  [[ "$chosen" == "󰁫 Timer Capture" ]] && countdown="$(timer_cmd)"
+
+  type="$(type_screenshot_cmd)"
+  [[ "$type" == "󰍺 All Screen" ]] && option_type_screenshot="screen"
+  [[ "$type" == "󰍹 Active Screen" ]] && option_type_screenshot="output"
+  [[ "$type" == "󱣴 Area" ]] && option_type_screenshot="area"
+
+  action="$(copy_save_cmd)"
+  case "$action" in
+    " Copy") actions=("copy") ;;
+    " Save") actions=("save") ;;
+    "Copy & Save") actions=("copy" "save") ;;
+    "Edit Screenshot") actions=("edit") ;;
+  esac
+}
+
+# Entry Point
+main() {
+  if [[ $# -eq 0 ]]; then
+    fallback_rofi
+  else
+    parse_args "$@"
   fi
+
+  if [[ -z "$option_type_screenshot" || ${#actions[@]} -eq 0 ]]; then
+    echo "Error: Screenshot type or action missing. Use --help"
+    exit 1
+  fi
+
+  takescreenshot
 }
 
-# Actions
-chosen="$(run_rofi)"
-case ${chosen} in
-$option_1)
-  run_cmd --opt1
-  ;;
-$option_2)
-  run_cmd --opt2
-  ;;
-esac
+main "$@"
