@@ -3,7 +3,7 @@ My hyprland configuration files
 
 ### Installation
 ```sh
-bash -c "bash <(curl -sL https://raw.githubusercontent.com/erffy-dots/hyprland/main/install.sh)"
+bash -c "CONFIG_NAME=hyprland CONFIG_DIR_NAME=hypr $(curl -fsSL https://raw.githubusercontent.com/erffy-dots/.generic/main/install_subconfig.sh)"
 ```
 
 ### Screenshots
