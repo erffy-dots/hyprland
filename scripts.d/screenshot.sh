@@ -8,43 +8,53 @@ FILENAME="Screenshot_$TIME_NOW.png"
 LOGFILE="$SAVE_DIR/screenshot.log"
 
 MODE="region"
-COPY="true"
+COPY=true
 
 print_help() {
     cat <<EOF
+Hyprshot - Screenshot Utility
+
 Usage: screenshot [mode] [options]
 
 Modes:
   region        Capture a selected region (default)
   window        Capture the active window
-  full          Capture the entire screen
+  output        Capture entire monitor
 
 Options:
   --no-clipboard    Do not copy screenshot to clipboard
   -h, --help        Show this help message
 
-Example:
+Examples:
+  screenshot window
   screenshot full --no-clipboard
 EOF
 }
 
 take_screenshot() {
     mkdir -p "$SAVE_DIR"
+    local filepath="$SAVE_DIR/$FILENAME"
 
-    hyprshot -z -m $MODE -o "$SAVE_DIR" -f "$FILENAME" 
+    hyprshot -z -m $MODE -o "$SAVE_DIR" -f "$FILENAME"
 
-    echo "$(date): Saved $SAVE_DIR/$FILENAME" >> "$LOGFILE"
+    echo "$(date): Saved $filepath" >> "$LOGFILE"
+    echo "✅ Screenshot saved to: $filepath"
+
+    if $COPY; then
+        wl-copy < "$filepath"
+        echo "📋 Copied to clipboard"
+    fi
 }
 
+# Argument parsing
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        region|window|full|fullscreen)
-            MODE="${1/full/full}"
-            MODE="${MODE/fullscreen/full}"
+        region|window|output)
+            MODE="$1"
             shift
             ;;
         --no-clipboard)
-            COPY="false"
+            COPY=false
             shift
             ;;
         -h|--help)
